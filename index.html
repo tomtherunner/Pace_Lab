@@ -245,6 +245,18 @@
             .container { padding: 32px 20px 20px 20px; }
             .app-header h1 { font-size: 28px; }
         }
+        .logo-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.logo {
+  width: 28px;
+  height: 28px;
+}
+
     </style>
 </head>
 <body>
@@ -259,7 +271,10 @@
     </div>
 
     <header class="app-header">
-        <h1>PaceLab</h1>
+        <div class="logo-wrapper">
+  <img src="logo.png" alt="PaceLab logo" class="logo">
+  <h1>PaceLab</h1>
+</div>
         <p>Minimal running pace calculator</p>
     </header>
 
