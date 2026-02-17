@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PaceLab</title>
+    <title>PaceLab — Minimal Pace Calculator</title>
     <style>
         :root {
             --bg-color: #f5f5f7;
@@ -12,7 +12,7 @@
             --text-primary: #1d1d1f;
             --text-secondary: #86868b;
             --border-color: #d2d2d7;
-            --system-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+            --system-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
         }
 
         * {
@@ -37,20 +37,30 @@
             width: 100%;
             max-width: 440px;
             background: var(--card-bg);
-            padding: 32px;
+            padding: 40px 32px 24px 32px;
             border-radius: 24px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.04);
         }
 
-        header {
+        /* 1. Enhanced Product Header */
+        .app-header {
             text-align: center;
-            margin-bottom: 24px;
+            margin-bottom: 32px;
         }
 
-        h1 {
-            font-size: 26px;
-            font-weight: 600;
-            letter-spacing: -0.5px;
+        .app-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.022em;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .app-header p {
+            font-size: 15px;
+            font-weight: 400;
+            color: var(--text-secondary);
+            letter-spacing: -0.01em;
         }
 
         .section-title {
@@ -58,12 +68,11 @@
             font-weight: 600;
             color: var(--text-secondary);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.05em;
             margin-bottom: 12px;
             margin-top: 24px;
         }
 
-        /* Grids & Inputs */
         .btn-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -99,14 +108,13 @@
             font-family: var(--system-font);
             outline: none;
             background: #fff;
+            transition: border-color 0.2s ease;
         }
 
         input:focus {
             border-color: #007aff;
-            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
         }
 
-        /* Buttons */
         .btn-preset {
             padding: 8px 4px;
             background: #f5f5f7;
@@ -134,14 +142,14 @@
             font-weight: 600;
             cursor: pointer;
             margin-top: 8px;
-            transition: transform 0.1s;
+            transition: opacity 0.2s;
         }
 
         .btn-primary:active {
-            transform: scale(0.98);
+            opacity: 0.85;
+            transform: scale(0.99);
         }
 
-        /* Results & Table */
         .result-box {
             background: #fbfbfd;
             padding: 16px;
@@ -184,22 +192,31 @@
             margin: 32px 0;
         }
 
-        .footer-note {
+        /* 2. Minimal Footer */
+        .app-footer {
+            margin-top: 40px;
+            text-align: center;
             font-size: 12px;
             color: var(--text-secondary);
-            text-align: center;
-            margin-top: 24px;
+            opacity: 0.7;
+            font-weight: 400;
+        }
+
+        @media (max-width: 400px) {
+            .container { padding: 32px 20px 20px 20px; }
+            .app-header h1 { font-size: 28px; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <header>
+    <header class="app-header">
         <h1>PaceLab</h1>
+        <p>Minimal running pace calculator</p>
     </header>
 
-    <!-- 1. Pace Calculator -->
+    <!-- Pace Calculator -->
     <div class="section">
         <div class="section-title">Calculator</div>
         
@@ -240,7 +257,7 @@
 
     <div class="divider"></div>
 
-    <!-- 2. Reverse Calculator -->
+    <!-- Reverse Calculator -->
     <div class="section">
         <div class="section-title">Finish Time & Splits</div>
         
@@ -278,13 +295,14 @@
         </div>
     </div>
 
-    <p class="footer-note">Designed for performance.</p>
+    <footer class="app-footer">
+        Built by TomTheRunner
+    </footer>
 </div>
 
 <script>
     const HM_DIST = 21.0975;
 
-    // Helper: Time String to Total Seconds
     function toSeconds(str) {
         const p = str.split(':').map(Number);
         if (p.length === 3) return (p[0] * 3600) + (p[1] * 60) + p[2];
@@ -292,7 +310,6 @@
         return 0;
     }
 
-    // Helper: Seconds to Time String
     function fromSeconds(s, forceHrs = false) {
         const h = Math.floor(s / 3600);
         const m = Math.floor((s % 3600) / 60);
@@ -302,7 +319,6 @@
         return parts.join(':');
     }
 
-    // 1. Pace Calculator Functions
     function setDist(val) {
         document.getElementById('p-dist').value = val;
         document.getElementById('p-unit').value = 'km';
@@ -313,19 +329,15 @@
         const d = parseFloat(document.getElementById('p-dist').value);
         const u = document.getElementById('p-unit').value;
         const t = toSeconds(document.getElementById('p-time').value);
-        
         if (!d || !t) return;
-
         const dKm = (u === 'mi') ? d * 1.60934 : d;
         const paceSec = t / dKm;
         const speed = (dKm / (t / 3600)).toFixed(2);
-
         document.getElementById('res-pace').innerText = fromSeconds(paceSec) + ' /km';
         document.getElementById('res-speed').innerText = speed;
         document.getElementById('p-res-box').style.display = 'block';
     }
 
-    // 2. Reverse Calculator Functions
     function setGoal(timeStr) {
         const totalSec = toSeconds(timeStr);
         const paceSec = totalSec / HM_DIST;
@@ -337,21 +349,15 @@
         const paceStr = document.getElementById('r-pace').value;
         const paceSec = toSeconds(paceStr);
         if (!paceSec) return;
-
-        // Finish Time
         const finishSec = paceSec * HM_DIST;
         document.getElementById('res-finish').innerText = fromSeconds(finishSec, true);
-
-        // Splits
         const tbody = document.getElementById('split-body');
         tbody.innerHTML = '';
-        
         const checkpoints = [5, 10, 15, 20, HM_DIST];
         checkpoints.forEach((km) => {
             const tr = document.createElement('tr');
             const isFinish = km === HM_DIST;
             const timeAtSplit = paceSec * km;
-            
             tr.innerHTML = `
                 <td style="${isFinish ? 'font-weight:700' : ''}">${isFinish ? 'Finish' : Math.floor(km/5)}</td>
                 <td>${km} km</td>
@@ -359,11 +365,9 @@
             `;
             tbody.appendChild(tr);
         });
-
         document.getElementById('r-res-box').style.display = 'block';
     }
 
-    // Auto-run on load
     window.onload = () => {
         runPaceCalc();
         runSplitCalc();
