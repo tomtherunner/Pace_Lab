@@ -1,18 +1,14 @@
 {
   "name": "PaceLab",
   "short_name": "PaceLab",
-  "start_url": "/",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#1d4ed8",
+  "theme_color": "#5e5ce6",
   "icons": [
     {
-      "src": "/icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/icons/icon-512.png",
+      "src": "icons/icon.png",
       "sizes": "512x512",
       "type": "image/png"
     }
