@@ -1,10 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="icon" type="image/png" href="favicon.png">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PaceLab — Minimal Pace Calculator</title>
+    
+    <!-- PWA: Manifest and iOS meta -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon.png">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <style>
         /* CSS Variables for Theme Management */
         :root {
@@ -63,13 +70,11 @@
             transition: background-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
         }
 
-        /* Dark/Light Toggle Switch */
+        /* Theme Toggle Switch */
         .theme-toggle {
             position: absolute;
             top: 24px;
             right: 24px;
-            display: flex;
-            align-items: center;
         }
 
         .switch {
@@ -104,17 +109,29 @@
         input:checked + .slider { background-color: #5e5ce6; }
         input:checked + .slider:before { transform: translateX(18px); }
 
-        /* Typography & Layout */
+        /* Header & Logo */
         .app-header {
             text-align: center;
             margin-bottom: 32px;
         }
 
+        .logo-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 4px;
+        }
+
+        .logo {
+            height: 42px;
+            width: auto;
+        }
+
         .app-header h1 {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 700;
             letter-spacing: -0.022em;
-            margin-bottom: 4px;
         }
 
         .app-header p {
@@ -123,6 +140,7 @@
             color: var(--text-secondary);
         }
 
+        /* Section Styling */
         .section-title {
             font-size: 13px;
             font-weight: 600;
@@ -198,7 +216,6 @@
             margin-top: 16px;
             text-align: center;
             border: 1px solid var(--border-color);
-            transition: background-color var(--transition-speed) ease;
         }
 
         .result-value {
@@ -241,37 +258,13 @@
             opacity: 0.7;
         }
 
-        @media (max-width: 400px) {
-            .container { padding: 32px 20px 20px 20px; }
-            .app-header h1 { font-size: 28px; }
+        /* Responsive Logic */
+        @media (max-width: 440px) {
+            .container { padding: 32px 20px 24px 20px; }
+            .logo { height: 32px; }
+            .app-header h1 { font-size: 24px; }
         }
-  .logo {
-  height: 50px; /* výška pro desktop */
-  width: auto;  /* zachová poměr stran */
-  transition: height 0.2s ease; /* pěkný hladký přechod při změně velikosti */
-}
-
-/* Menší obrazovky (mobil) */
-@media (max-width: 768px) {
-  .logo {
-    height: 35px; /* menší logo na mobilech */
-  }
-}
-
-/* Extra malé obrazovky (malé mobily) */
-@media (max-width: 480px) {
-  .logo {
-    height: 28px; /* ještě menší, aby nepřesahovalo navbar */
-  }
-}
-
     </style>
-    <!-- PWA: Manifest a iOS meta -->
-<link rel="manifest" href="/manifest.json">
-<link rel="apple-touch-icon" href="/icons/icon.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
 </head>
 <body>
 
@@ -286,9 +279,9 @@
 
     <header class="app-header">
         <div class="logo-wrapper">
-  <img src="logo.png" alt="PaceLab logo" class="logo">
-  <h1>PaceLab</h1>
-</div>
+            <img src="logo.png" alt="PaceLab logo" class="logo" onerror="this.style.display='none'">
+            <h1>PaceLab</h1>
+        </div>
         <p>Minimal running pace calculator</p>
     </header>
 
@@ -305,7 +298,7 @@
         <div class="input-group">
             <div class="input-field" style="flex: 2;">
                 <label>Distance</label>
-                <input type="number" id="p-dist" value="21.0975" step="0.1">
+                <input type="number" id="p-dist" value="21.0975" step="0.01">
             </div>
             <div class="input-field">
                 <label>Unit</label>
@@ -363,16 +356,10 @@
 <script>
     const HM_DIST = 21.0975;
 
-    // Theme Logic
     function toggleTheme() {
         const isDark = document.getElementById('theme-checkbox').checked;
-        if (isDark) {
-            document.body.classList.add('dark-mode');
-            localStorage.setItem('paceLabTheme', 'dark');
-        } else {
-            document.body.classList.remove('dark-mode');
-            localStorage.setItem('paceLabTheme', 'light');
-        }
+        document.body.classList.toggle('dark-mode', isDark);
+        localStorage.setItem('paceLabTheme', isDark ? 'dark' : 'light');
     }
 
     function loadTheme() {
@@ -383,7 +370,6 @@
         }
     }
 
-    // Calculator Logic (Unchanged)
     function toSeconds(str) {
         const p = str.split(':').map(Number);
         if (p.length === 3) return (p[0] * 3600) + (p[1] * 60) + p[2];
@@ -440,7 +426,7 @@
             const isFinish = km === HM_DIST;
             const timeAtSplit = paceSec * km;
             tr.innerHTML = `
-                <td style="${isFinish ? 'font-weight:700' : ''}">${isFinish ? 'Finish' : Math.floor(km/5)}</td>
+                <td style="${isFinish ? 'font-weight:700' : ''}">${isFinish ? 'Finish' : Math.floor(km/5) + ' (5km)'}</td>
                 <td>${km} km</td>
                 <td><strong>${fromSeconds(timeAtSplit, true)}</strong></td>
             `;
@@ -453,17 +439,11 @@
         loadTheme();
         runPaceCalc();
         runSplitCalc();
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js', { scope: './' })
+.catch(() => {});
+        }
     };
 </script>
-<script src="main.js"></script>
-<script>
-  // Registrace service workeru
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js')
-      .then(() => console.log('Service Worker registered'))
-      .catch(err => console.error('SW registration failed:', err));
-  }
-</script>
-
 </body>
 </html>
